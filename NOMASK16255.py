@@ -37,7 +37,6 @@ class ThemeMode(Enum):
 
 @dataclass(frozen=True)
 class DesignTokens:
-    # Colors
     bg_primary: str = "#0a0f1a"
     bg_secondary: str = "#111827"
     bg_tertiary: str = "#1e293b"
@@ -47,42 +46,35 @@ class DesignTokens:
     fg_primary: str = "#f1f5f9"
     fg_secondary: str = "#94a3b8"
     fg_muted: str = "#64748b"
-    accent_primary: str = "#22d3ee"      # cyan-400
-    accent_secondary: str = "#a855f7"    # purple-500
-    accent_tertiary: str = "#f472b6"     # pink-400
+    accent_primary: str = "#22d3ee"
+    accent_secondary: str = "#a855f7"
+    accent_tertiary: str = "#f472b6"
     success: str = "#22c55e"
     warning: str = "#fbbf24"
     error: str = "#ef4444"
-    # Gradients
     grad_primary: str = "linear-gradient(135deg, #22d3ee 0%, #a855f7 100%)"
     grad_secondary: str = "linear-gradient(135deg, #a855f7 0%, #f472b6 100%)"
     grad_mesh: str = "radial-gradient(ellipse at 50% 0%, rgba(34, 211, 238, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 100% 100%, rgba(168, 85, 247, 0.15) 0%, transparent 50%)"
-    # Spacing
     space_xs: str = "0.25rem"
     space_sm: str = "0.5rem"
     space_md: str = "1rem"
     space_lg: str = "1.5rem"
     space_xl: str = "2rem"
     space_2xl: str = "3rem"
-    # Radius
     radius_sm: str = "6px"
     radius_md: str = "10px"
     radius_lg: str = "16px"
     radius_xl: str = "24px"
     radius_full: str = "9999px"
-    # Shadows
     shadow_sm: str = "0 1px 2px rgba(0,0,0,0.3)"
     shadow_md: str = "0 4px 12px rgba(0,0,0,0.35)"
     shadow_lg: str = "0 12px 32px rgba(0,0,0,0.4)"
     shadow_glow: str = "0 0 32px rgba(34, 211, 238, 0.2)"
-    # Typography
     font_sans: str = "'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
     font_mono: str = "'JetBrains Mono', 'Fira Code', monospace"
-    # Transitions
     transition_fast: str = "120ms cubic-bezier(0.4, 0, 0.2, 1)"
     transition_normal: str = "200ms cubic-bezier(0.4, 0, 0.2, 1)"
     transition_slow: str = "350ms cubic-bezier(0.4, 0, 0.2, 1)"
-    # Z-index
     z_dropdown: int = 100
     z_modal: int = 200
     z_toast: int = 300
@@ -90,7 +82,6 @@ class DesignTokens:
 
 TOKENS = DesignTokens()
 
-# Light mode overrides
 LIGHT_OVERRIDES = {
     "bg_primary": "#f8fafc",
     "bg_secondary": "#ffffff",
@@ -107,7 +98,7 @@ LIGHT_OVERRIDES = {
     "grad_mesh": "radial-gradient(ellipse at 50% 0%, rgba(34, 211, 238, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 100% 100%, rgba(168, 85, 247, 0.08) 0%, transparent 50%)",
 }
 
-# ═══════════════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════════════════
 # DOMAIN MODELS
 # ═══════════════════════════════════════════════════════════════════════
 
@@ -124,10 +115,10 @@ class VariableDef:
     default: str = ""
     placeholder: str = ""
     required: bool = True
-    type: str = "text"  # text, textarea, select, multiselect, boolean, number
+    type: str = "text"
     options: List[str] = field(default_factory=list)
     help: str = ""
-    validation: Optional[str] = None  # regex pattern
+    validation: Optional[str] = None
     group: str = "general"
 
 @dataclass
@@ -137,7 +128,7 @@ class TemplatePart:
     content: str
     section: SectionType
     tags: List[str] = field(default_factory=list)
-    weight: float = 1.0  # for weighted random selection
+    weight: float = 1.0
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass
@@ -145,7 +136,7 @@ class StyleDef:
     name: str
     label: str
     description: str
-    code: str  # lambda expression as string
+    code: str
     preview: str = ""
     category: str = "general"
 
@@ -176,7 +167,7 @@ class SectorDef:
     icon: str
     color: str
     gradient: str
-    categories: List[str] = field(default_factory=list)  # category keys
+    categories: List[str] = field(default_factory=list)
     order: int = 0
 
 @dataclass
@@ -226,7 +217,6 @@ class DefaultGenerator:
             parts = category.parts.get(section, [])
             if not parts:
                 continue
-            # Weighted random
             weights = [p.weight for p in parts]
             part = random.choices(parts, weights=weights, k=1)[0]
             selected_parts.append(part.content)
@@ -262,7 +252,6 @@ class DefaultGenerator:
 
     def _apply_style(self, text: str, style_code: str) -> str:
         try:
-            # Safe eval with limited builtins
             safe_globals = {
                 "__builtins__": {
                     "str": str, "len": len, "range": range, "enumerate": enumerate,
@@ -355,8 +344,6 @@ class HTMLExporter:
 # ═══════════════════════════════════════════════════════════════════════
 
 class Registry:
-    """Central registry for all plugins, sectors, categories."""
-    
     def __init__(self):
         self.sectors: Dict[str, SectorDef] = {}
         self.categories: Dict[str, CategoryDef] = {}
@@ -371,7 +358,6 @@ class Registry:
         self._load_builtins()
     
     def _load_builtins(self):
-        # Define sectors
         sectors = [
             SectorDef("personal", "Personal", "Dating, relationships, personal branding", "💖", "#ec4899", "linear-gradient(135deg, #ec4899 0%, #f472b6 100%)", order=1),
             SectorDef("professional", "Professional", "Career, business, networking, thought leadership", "💼", "#3b82f6", "linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)", order=2),
@@ -383,7 +369,6 @@ class Registry:
         for s in sectors:
             self.sectors[s.key] = s
         
-        # Load categories (will populate sector.categories)
         for cat in self._build_default_categories():
             self.register_category(cat)
     
@@ -415,42 +400,31 @@ class Registry:
         return self.exporters.get(name, self.exporters["text"])
     
     # ═══════════════════════════════════════════════════════════════════════
-    # BUILT-IN CATEGORIES (Rich, Real-World)
+    # BUILT-IN CATEGORIES (ALL FIXED: description= not description:)
     # ═══════════════════════════════════════════════════════════════════════
     
     def _build_default_categories(self) -> List[CategoryDef]:
         return [
-            # PERSONAL SECTOR
             self._cat_romance_dating(),
             self._cat_personal_bio(),
             self._cat_friendship_social(),
-            
-            # PROFESSIONAL SECTOR
             self._cat_linkedin_bio(),
             self._cat_elevator_pitch(),
             self._cat_cover_letter(),
             self._cat_freelance_profile(),
-            
-            # CREATIVE SECTOR
             self._cat_story_hook(),
             self._cat_character_sheet(),
             self._cat_worldbuilding(),
             self._cat_poetry_prompt(),
-            
-            # MARKETING SECTOR
             self._cat_ad_copy(),
             self._cat_email_sequence(),
             self._cat_landing_page(),
             self._cat_social_media(),
             self._cat_product_launch(),
-            
-            # TECHNICAL SECTOR
             self._cat_api_documentation(),
             self._cat_changelog(),
             self._cat_readme(),
             self._cat_technical_spec(),
-            
-            # ACADEMIC SECTOR
             self._cat_research_abstract(),
             self._cat_grant_proposal(),
             self._cat_literature_review(),
@@ -507,7 +481,7 @@ class Registry:
         return CategoryDef(
             key="personal_bio",
             name="Personal Bio / About Me",
-            description: "For personal websites, Instagram, Twitter/X, newsletters. Your story in your voice.",
+            description="For personal websites, Instagram, Twitter/X, newsletters. Your story in your voice.",
             icon="📖",
             sector="personal",
             variables=[
@@ -550,7 +524,7 @@ class Registry:
         return CategoryDef(
             key="friendship_social",
             name="Making Friends / Social Circle",
-            description: "For Bumble BFF, Meetup, Discord intros, new city arrivals. Platonic, warm, specific.",
+            description="For Bumble BFF, Meetup, Discord intros, new city arrivals. Platonic, warm, specific.",
             icon="🤝",
             sector="personal",
             variables=[
@@ -590,7 +564,7 @@ class Registry:
         return CategoryDef(
             key="linkedin_bio",
             name="LinkedIn About Section",
-            description: "The 2,600-char About section. Narrative, keyword-rich, human. Not a resume dump.",
+            description="The 2,600-char About section. Narrative, keyword-rich, human. Not a resume dump.",
             icon="💼",
             sector="professional",
             variables=[
@@ -638,7 +612,7 @@ class Registry:
         return CategoryDef(
             key="elevator_pitch",
             name="Elevator Pitch (30/60/90 sec)",
-            description: "For networking events, intros, investor meetings. Modular by time.",
+            description="For networking events, intros, investor meetings. Modular by time.",
             icon="🎤",
             sector="professional",
             variables=[
@@ -681,7 +655,7 @@ class Registry:
         return CategoryDef(
             key="cover_letter",
             name="Cover Letter / Cold Outreach",
-            description: "Tailored, specific, shows you did homework. Not a template — a framework.",
+            description="Tailored, specific, shows you did homework. Not a template — a framework.",
             icon="📝",
             sector="professional",
             variables=[
@@ -719,7 +693,7 @@ class Registry:
         return CategoryDef(
             key="freelance_profile",
             name="Freelance / Upwork / Toptal Profile",
-            description: "Client-facing, outcome-oriented, trust-building. Specialized by niche.",
+            description="Client-facing, outcome-oriented, trust-building. Specialized by niche.",
             icon="💻",
             sector="professional",
             variables=[
@@ -762,7 +736,7 @@ class Registry:
         return CategoryDef(
             key="story_hook",
             name="Story Hook / Logline",
-            description: "One-sentence hooks for novels, screenplays, games. High concept + emotional stakes.",
+            description="One-sentence hooks for novels, screenplays, games. High concept + emotional stakes.",
             icon="🎬",
             sector="creative",
             variables=[
@@ -806,7 +780,7 @@ class Registry:
         return CategoryDef(
             key="character_sheet",
             name="Character Sheet / Profile",
-            description: "Deep character profiles for novels, RPGs, screenwriting. Psychology > stats.",
+            description="Deep character profiles for novels, RPGs, screenwriting. Psychology > stats.",
             icon="🎭",
             sector="creative",
             variables=[
@@ -851,7 +825,7 @@ class Registry:
         return CategoryDef(
             key="worldbuilding",
             name="Worldbuilding Brief",
-            description: "Magic systems, tech specs, political structures, cultures. Consistent, usable.",
+            description="Magic systems, tech specs, political structures, cultures. Consistent, usable.",
             icon="🌍",
             sector="creative",
             variables=[
@@ -889,7 +863,7 @@ class Registry:
         return CategoryDef(
             key="poetry_prompt",
             name="Poetry Prompt / Exercise",
-            description: "Generative prompts for poets. Form, constraint, theme, seed line.",
+            description="Generative prompts for poets. Form, constraint, theme, seed line.",
             icon="📜",
             sector="creative",
             variables=[
@@ -923,7 +897,7 @@ class Registry:
         return CategoryDef(
             key="ad_copy",
             name="Ad Copy (Meta/Google/TikTok)",
-            description: "Direct response frameworks: PAS, AIDA, BAB, 4U. Platform-optimized.",
+            description="Direct response frameworks: PAS, AIDA, BAB, 4U. Platform-optimized.",
             icon="📢",
             sector="marketing",
             variables=[
@@ -974,7 +948,7 @@ class Registry:
         return CategoryDef(
             key="email_sequence",
             name="Email Sequence (Welcome/Nurture/Sales)",
-            description: "Multi-email sequences with strategy. Subject lines + preview text + body.",
+            description="Multi-email sequences with strategy. Subject lines + preview text + body.",
             icon="📧",
             sector="marketing",
             variables=[
@@ -1012,7 +986,7 @@ class Registry:
         return CategoryDef(
             key="landing_page",
             name="Landing Page Copy",
-            description: "Hero, value props, social proof, FAQ, final CTA. Conversion-focused.",
+            description="Hero, value props, social proof, FAQ, final CTA. Conversion-focused.",
             icon="🌐",
             sector="marketing",
             variables=[
@@ -1055,7 +1029,7 @@ class Registry:
         return CategoryDef(
             key="social_media",
             name="Social Media Posts (LinkedIn/Twitter/Threads)",
-            description: "Platform-native formats. Hooks, threads, carousels, engagement bait.",
+            description="Platform-native formats. Hooks, threads, carousels, engagement bait.",
             icon="📱",
             sector="marketing",
             variables=[
@@ -1099,7 +1073,7 @@ class Registry:
         return CategoryDef(
             key="product_launch",
             name="Product Launch (Product Hunt / Launch Week)",
-            description: "Launch day assets: tagline, hunter blurb, maker comment, tweet storm, email.",
+            description="Launch day assets: tagline, hunter blurb, maker comment, tweet storm, email.",
             icon="🚀",
             sector="marketing",
             variables=[
@@ -1141,7 +1115,7 @@ class Registry:
         return CategoryDef(
             key="api_documentation",
             name="API Reference Documentation",
-            description: "OpenAPI-ready, developer-friendly. Endpoints, params, examples, errors.",
+            description="OpenAPI-ready, developer-friendly. Endpoints, params, examples, errors.",
             icon="📚",
             sector="technical",
             variables=[
@@ -1185,7 +1159,7 @@ class Registry:
         return CategoryDef(
             key="changelog",
             name="Changelog / Release Notes",
-            description: "Keep a Changelog format. User-facing, categorized, linkable.",
+            description="Keep a Changelog format. User-facing, categorized, linkable.",
             icon="📋",
             sector="technical",
             variables=[
@@ -1227,7 +1201,7 @@ class Registry:
         return CategoryDef(
             key="readme",
             name="README.md (Project/Repo)",
-            description: "Badges, quick start, features, install, usage, contributing, license.",
+            description="Badges, quick start, features, install, usage, contributing, license.",
             icon="📄",
             sector="technical",
             variables=[
@@ -1255,7 +1229,7 @@ class Registry:
                     TemplatePart("c1", "Usage + Links", "## Usage\n{usage}\n\n## Contributing\n{contributing}\n\n## License\n{license}", SectionType.CLOSER, weight=1.0),
                 ],
                 SectionType.EXTRA: [],
-            ],
+            },
             styles=[
                 StyleDef("clean", "Clean", "Plain", "lambda t: t"),
                 StyleDef("github", "GitHub Profile", "Compact", "lambda t: t.replace('## ', '### ')"),
@@ -1266,7 +1240,7 @@ class Registry:
         return CategoryDef(
             key="technical_spec",
             name="Technical Spec / RFC",
-            description: "Architecture decisions, API contracts, data models, migration plans. For engineering review.",
+            description="Architecture decisions, API contracts, data models, migration plans. For engineering review.",
             icon="📐",
             sector="technical",
             variables=[
@@ -1297,7 +1271,7 @@ class Registry:
                     TemplatePart("c1", "Migration + Risks", "## Migration Plan\n{migration}\n\n## Risks & Mitigation\n{risks}\n\n## Rollback\n{rollback}", SectionType.CLOSER, weight=1.0),
                 ],
                 SectionType.EXTRA: [],
-            ],
+            },
             styles=[
                 StyleDef("clean", "Clean", "Plain", "lambda t: t"),
                 StyleDef("markdown", "Markdown RFC", "GitHub-ready", "lambda t: t"),
@@ -1310,7 +1284,7 @@ class Registry:
         return CategoryDef(
             key="research_abstract",
             name="Research Paper Abstract",
-            description: "Structured abstract: Background, Methods, Results, Conclusions. Journal-ready.",
+            description="Structured abstract: Background, Methods, Results, Conclusions. Journal-ready.",
             icon="🔬",
             sector="academic",
             variables=[
@@ -1343,7 +1317,7 @@ class Registry:
         return CategoryDef(
             key="grant_proposal",
             name="Grant Proposal (NIH/NSF/EU Style)",
-            description: "Specific aims, significance, innovation, approach, timeline. Reviewer-friendly.",
+            description="Specific aims, significance, innovation, approach, timeline. Reviewer-friendly.",
             icon="💰",
             sector="academic",
             variables=[
@@ -1374,7 +1348,7 @@ class Registry:
                     TemplatePart("c1", "Budget Justification", "Budget: Personnel (60%), Compute (20%), Participant compensation (15%), Travel/Dissemination (5%).", SectionType.CLOSER, weight=0.8),
                 ],
                 SectionType.EXTRA: [],
-            ],
+            },
             styles=[
                 StyleDef("clean", "Clean", "Plain", "lambda t: t"),
                 StyleDef("nih", "NIH Format", "Specific Aims page", "lambda t: t"),
@@ -1386,7 +1360,7 @@ class Registry:
         return CategoryDef(
             key="literature_review",
             name="Literature Review Section",
-            description: "Thematic synthesis, gap identification, theoretical framework. Not a bibliography dump.",
+            description="Thematic synthesis, gap identification, theoretical framework. Not a bibliography dump.",
             icon="📚",
             sector="academic",
             variables=[
@@ -1426,7 +1400,6 @@ class Registry:
 # ═══════════════════════════════════════════════════════════════════════
 
 def inject_premium_css():
-    """Inject complete premium design system."""
     css = f"""
 <style>
 :root {{
@@ -1478,7 +1451,6 @@ html, body, [data-testid="stAppViewContainer"] {{
     font-family: var(--font-sans) !important;
 }}
 
-/* Mesh gradient background */
 [data-testid="stAppViewContainer"]::before {{
     content: "";
     position: fixed;
@@ -1488,14 +1460,12 @@ html, body, [data-testid="stAppViewContainer"] {{
     z-index: -1;
 }}
 
-/* Main container */
 .main .block-container {{
     padding-top: 1rem !important;
     padding-bottom: 2rem !important;
     max-width: 1400px !important;
 }}
 
-/* Premium Card */
 .premium-card {{
     background: var(--bg-glass);
     backdrop-filter: blur(20px);
@@ -1512,7 +1482,6 @@ html, body, [data-testid="stAppViewContainer"] {{
     box-shadow: var(--shadow-lg);
 }}
 
-/* Glass Card (lighter) */
 .glass-card {{
     background: var(--bg-glass);
     backdrop-filter: blur(16px);
@@ -1523,7 +1492,6 @@ html, body, [data-testid="stAppViewContainer"] {{
     margin-bottom: var(--space-sm);
 }}
 
-/* Gradient Border Card */
 .grad-border-card {{
     position: relative;
     background: var(--bg-secondary);
@@ -1546,7 +1514,6 @@ html, body, [data-testid="stAppViewContainer"] {{
     opacity: 0.6;
 }}
 
-/* Buttons */
 .stButton > button {{
     background: var(--bg-tertiary) !important;
     color: var(--fg-primary) !important;
@@ -1579,157 +1546,61 @@ html, body, [data-testid="stAppViewContainer"] {{
     box-shadow: 0 0 24px rgba(34, 211, 238, 0.4) !important;
 }}
 
-/* Inputs */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea,
-.stSelectbox > div > div > div,
-.stNumberInput > div > div > input {{
+.stSelectbox > div > div > div {{
     background: var(--bg-tertiary) !important;
     color: var(--fg-primary) !important;
     border: 1px solid var(--border-subtle) !important;
     border-radius: var(--radius-md) !important;
-    font-family: var(--font-sans) !important;
-    transition: all var(--transition-fast) !important;
-}}
-.stTextInput > div > div > input:focus,
-.stTextArea > div > div > textarea:focus,
-.stSelectbox > div > div > div:focus-within {{
-    border-color: var(--accent-primary) !important;
-    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15) !important;
 }}
 
-/* Selectbox dropdown */
-.stSelectbox [data-baseweb="popover"] {{
-    background: var(--bg-secondary) !important;
-    border: 1px solid var(--border-strong) !important;
-    border-radius: var(--radius-md) !important;
-    box-shadow: var(--shadow-lg) !important;
-}}
-
-/* Tabs */
-.stTabs [data-baseweb="tab-list"] {{
-    gap: 4px;
-    background: transparent !important;
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 0;
-}}
+.stTabs [data-baseweb="tab-list"] {{ gap: 4px; }}
 .stTabs [data-baseweb="tab"] {{
-    background: transparent !important;
-    color: var(--fg-secondary) !important;
-    border: none !important;
-    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
-    padding: var(--space-sm) var(--space-md) !important;
-    font-weight: 500 !important;
-    font-size: 0.875rem !important;
-    position: relative !important;
-    transition: all var(--transition-fast) !important;
-}}
-.stTabs [data-baseweb="tab"]:hover {{
-    color: var(--fg-primary) !important;
     background: var(--bg-tertiary) !important;
+    color: var(--fg-secondary) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500 !important;
 }}
 .stTabs [aria-selected="true"] {{
-    color: var(--accent-primary) !important;
-    background: var(--bg-tertiary) !important;
-}}
-.stTabs [aria-selected="true"]::after {{
-    content: "";
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--grad-primary);
-    border-radius: 2px 2px 0 0;
+    background: var(--grad-primary) !important;
+    color: var(--bg-primary) !important;
+    border-color: var(--accent-primary) !important;
 }}
 
-/* Expander */
 .streamlit-expanderHeader {{
     background: var(--bg-tertiary) !important;
     border: 1px solid var(--border-subtle) !important;
     border-radius: var(--radius-md) !important;
-    color: var(--fg-primary) !important;
-    font-weight: 500 !important;
-    padding: var(--space-sm) var(--space-md) !important;
-}}
-.streamlit-expanderContent {{
-    background: var(--bg-secondary) !important;
-    border: 1px solid var(--border-subtle) !important;
-    border-top: none !important;
-    border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
-    padding: var(--space-md) !important;
+    color: var(--accent-primary) !important;
+    font-weight: 600 !important;
 }}
 
-/* Data Editor / DataFrame */
-.stDataFrame {{
-    background: var(--bg-secondary) !important;
-    border: 1px solid var(--border-subtle) !important;
-    border-radius: var(--radius-md) !important;
-}}
+.stDataFrame {{ background: var(--bg-tertiary) !important; }}
 
-/* Code blocks */
-.stCodeBlock, .stCodeBlock > div {{
-    background: #0d1117 !important;
-    border: 1px solid var(--border-subtle) !important;
-    border-radius: var(--radius-md) !important;
-}}
-.stCodeBlock code {{
-    font-family: var(--font-mono) !important;
-    font-size: 0.8rem !important;
-    line-height: 1.6 !important;
-}}
-
-/* Output Display */
-.output-display {{
+.output-box {{
     background: var(--bg-secondary);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
-    min-height: 280px;
+    min-height: 200px;
     font-family: var(--font-sans);
     line-height: 1.8;
     white-space: pre-wrap;
     word-wrap: break-word;
     position: relative;
-    overflow: hidden;
 }}
-.output-display::before {{
+.output-box::before {{
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     height: 3px;
     background: var(--grad-primary);
-}}
-.output-placeholder {{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 280px;
-    color: var(--fg-muted);
-    text-align: center;
-    padding: var(--space-2xl);
-}}
-.output-placeholder .icon {{
-    font-size: 3rem;
-    margin-bottom: var(--space-md);
-    opacity: 0.5;
-}}
-.output-placeholder .title {{
-    font-size: 1.125rem;
-    font-weight: 500;
-    color: var(--fg-secondary);
-    margin-bottom: var(--space-xs);
-}}
-.output-placeholder .desc {{
-    font-size: 0.875rem;
-    color: var(--fg-muted);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }}
 
-/* History Item */
 .history-item {{
     background: var(--bg-tertiary);
     border: 1px solid var(--border-subtle);
@@ -1738,413 +1609,107 @@ html, body, [data-testid="stAppViewContainer"] {{
     margin-bottom: var(--space-sm);
     cursor: pointer;
     transition: all var(--transition-fast);
-    position: relative;
-    overflow: hidden;
-}}
-.history-item::before {{
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--grad-primary);
-    opacity: 0;
-    transition: opacity var(--transition-fast);
 }}
 .history-item:hover {{
+    border-color: var(--accent-primary);
     background: var(--bg-glass);
-    border-color: var(--accent-primary);
-    transform: translateX(4px);
-}}
-.history-item:hover::before {{
-    opacity: 1;
-}}
-.history-item.current {{
-    border-color: var(--accent-primary);
-    background: rgba(34, 211, 238, 0.05);
-}}
-.history-item.current::before {{
-    opacity: 1;
-}}
-.history-preview {{
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: var(--fg-primary);
-    margin-bottom: var(--space-xs);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}}
-.history-meta {{
-    display: flex;
-    gap: var(--space-md);
-    font-size: 0.7rem;
-    color: var(--fg-muted);
-    flex-wrap: wrap;
-}}
-.history-badge {{
-    padding: 2px 8px;
-    border-radius: var(--radius-full);
-    background: var(--bg-primary);
-    border: 1px solid var(--border-subtle);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
 }}
 
-/* Sector Pill */
-.sector-pill {{
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
+.badge {{
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
     border-radius: var(--radius-full);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    border: 1px solid transparent;
 }}
-.sector-pill:hover {{
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}}
-.sector-pill.active {{
-    box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px currentColor;
-}}
+.badge-accent {{ background: var(--accent-primary); color: var(--bg-primary); }}
+.badge-success {{ background: var(--success); color: var(--bg-primary); }}
+.badge-warning {{ background: var(--warning); color: var(--bg-primary); }}
+.badge-error {{ background: var(--error); color: var(--bg-primary); }}
 
-/* Category Card */
-.category-card {{
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: var(--space-md);
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    position: relative;
-    overflow: hidden;
-}}
-.category-card::before {{
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--sector-gradient);
-    opacity: 0;
-    transition: opacity var(--transition-normal);
-}}
-.category-card:hover {{
-    border-color: var(--border-strong);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}}
-.category-card:hover::before {{
-    opacity: 1;
-}}
-.category-card.selected {{
-    border-color: var(--sector-color);
-    background: rgba(var(--sector-color-rgb), 0.08);
-}}
-.category-card.selected::before {{
-    opacity: 1;
-}}
-.category-icon {{
-    font-size: 1.5rem;
-    margin-bottom: var(--space-xs);
-}}
-.category-name {{
-    font-weight: 600;
-    font-size: 0.9375rem;
-    color: var(--fg-primary);
-    margin-bottom: 2px;
-}}
-.category-desc {{
-    font-size: 0.75rem;
-    color: var(--fg-muted);
-    line-height: 1.4;
-}}
+#MainMenu {{ visibility: hidden; }}
+footer {{ visibility: hidden; }}
+header {{ visibility: hidden; }}
 
-/* Variable Row */
-.variable-row {{
-    display: grid;
-    grid-template-columns: 140px 1fr 80px 40px;
-    gap: var(--space-sm);
-    align-items: start;
-    padding: var(--space-sm) 0;
-    border-bottom: 1px solid var(--border-subtle);
-}}
-.variable-row:last-child {{ border-bottom: none; }}
-.variable-label {{
-    font-size: 0.8125rem;
-    color: var(--fg-secondary);
-    font-weight: 500;
-}}
-.variable-required::after {{
-    content: "*";
-    color: var(--error);
-    margin-left: 2px;
-}}
-
-/* Template Part Card */
-.part-card {{
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    padding: var(--space-md);
-    margin-bottom: var(--space-sm);
-    transition: all var(--transition-fast);
-}}
-.part-card:hover {{
-    border-color: var(--border-strong);
-}}
-.part-header {{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-sm);
-}}
-.part-id {{
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--fg-muted);
-    background: var(--bg-primary);
-    padding: 2px 8px;
-    border-radius: var(--radius-sm);
-}}
-.part-name {{
-    font-weight: 600;
-    font-size: 0.875rem;
-}}
-.part-content {{
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--fg-secondary);
-    background: var(--bg-primary);
-    padding: var(--space-sm);
-    border-radius: var(--radius-sm);
-    white-space: pre-wrap;
-    word-break: break-word;
-    max-height: 120px;
-    overflow-y: auto;
-}}
-
-/* Toast */
-.toast-container {{
-    position: fixed;
-    bottom: var(--space-xl);
-    right: var(--space-xl);
-    z-index: {TOKENS.z_toast};
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    pointer-events: none;
-}}
-.toast {{
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-md);
-    padding: var(--space-md) var(--space-lg);
-    box-shadow: var(--shadow-lg);
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    min-width: 280px;
-    max-width: 400px;
-    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: auto;
-}}
-.toast.success {{ border-left: 3px solid var(--success); }}
-.toast.error {{ border-left: 3px solid var(--error); }}
-.toast.warning {{ border-left: 3px solid var(--warning); }}
-.toast.info {{ border-left: 3px solid var(--accent-primary); }}
-@keyframes slideIn {{
-    from {{ opacity: 0; transform: translateX(100px); }}
-    to {{ opacity: 1; transform: translateX(0); }}
-}}
-@keyframes slideOut {{
-    from {{ opacity: 1; transform: translateX(0); }}
-    to {{ opacity: 0; transform: translateX(100px); }}
-}}
-
-/* Modal Overlay */
-.modal-overlay {{
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: {TOKENS.z_modal};
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-lg);
-    animation: fadeIn 0.2s ease;
-}}
-@keyframes fadeIn {{ from {{ opacity: 0; }} to {{ opacity: 1; }} }}
-.modal {{
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
-    max-width: 560px;
-    width: 100%;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}}
-@keyframes slideUp {{
-    from {{ opacity: 0; transform: translateY(20px); }}
+@keyframes fadeInUp {{
+    from {{ opacity: 0; transform: translateY(10px); }}
     to {{ opacity: 1; transform: translateY(0); }}
 }}
-.modal-header {{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-lg);
-    padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--border-subtle);
-}}
-.modal-title {{
-    font-size: 1.125rem;
-    font-weight: 600;
-}}
-.modal-close {{
-    background: none;
-    border: none;
-    color: var(--fg-muted);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    transition: color var(--transition-fast);
-}}
-.modal-close:hover {{ color: var(--fg-primary); }}
-
-/* Keyboard Shortcut Hint */
-.kbd {{
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
-    padding: 2px 6px;
-    color: var(--fg-muted);
-    white-space: nowrap;
-}}
-
-/* Scrollbar */
-::-webkit-scrollbar {{ width: 8px; height: 8px; }}
-::-webkit-scrollbar-track {{ background: var(--bg-primary); }}
-::-webkit-scrollbar-thumb {{ background: var(--border-strong); border-radius: 4px; }}
-::-webkit-scrollbar-thumb:hover {{ background: var(--fg-muted); }}
-
-/* Hide Streamlit chrome */
-#MainMenu, footer, header, .stDeployButton {{ visibility: hidden !important; }}
-[data-testid="stToolbar"] {{ display: none !important; }}
-
-/* Responsive */
-@media (max-width: 768px) {{
-    .main .block-container {{ padding-left: var(--space-md) !important; padding-right: var(--space-md) !important; }}
-    .variable-row {{ grid-template-columns: 1fr; }}
-    .variable-label {{ grid-column: 1 / -1; }}
-}}
+.animate-in {{ animation: fadeInUp 0.3s ease-out forwards; }}
 </style>
 """
     st.markdown(css, unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════════════
-# STATE MANAGEMENT
+# SESSION STATE
 # ═══════════════════════════════════════════════════════════════════════
 
-def init_session_state():
-    defaults = {
-        "registry": Registry(),
-        "current_sector": "personal",
-        "current_category": "romance_dating",
-        "history": [],
-        "theme_mode": ThemeMode.DARK,
-        "toasts": [],
-        "modal_open": None,
-        "modal_data": None,
-        "editing_part": None,
-        "adding_part_section": None,
-        "adding_variable": False,
-        "show_new_category": False,
-        "show_new_sector": False,
-        "live_preview": True,
-        "auto_generate": False,
-        "keyboard_shortcuts": True,
+def init_state():
+    if 'registry' not in st.session_state:
+        st.session_state.registry = Registry()
+    if 'current_category' not in st.session_state:
+        st.session_state.current_category = "romance_dating"
+    if 'history' not in st.session_state:
+        st.session_state.history = []
+    if 'theme' not in st.session_state:
+        st.session_state.theme = "dark"
+    if 'show_new_cat' not in st.session_state:
+        st.session_state.show_new_cat = False
+    if 'editing_part' not in st.session_state:
+        st.session_state.editing_part = None
+    if 'adding_part_section' not in st.session_state:
+        st.session_state.adding_part_section = None
+    if 'adding_variable' not in st.session_state:
+        st.session_state.adding_variable = False
+
+init_state()
+registry = st.session_state.registry
+cat = registry.get_category(st.session_state.current_category)
+
+# ═══════════════════════════════════════════════════════════════════════
+# HELPERS
+# ═══════════════════════════════════════════════════════════════════════
+
+def toast(msg: str, icon: str = "✅"):
+    st.toast(msg, icon=icon)
+
+def export_category_json(key: str) -> str:
+    cat = registry.get_category(key)
+    data = {
+        'key': cat.key,
+        'name': cat.name,
+        'description': cat.description,
+        'icon': cat.icon,
+        'sector': cat.sector,
+        'variables': [asdict(v) for v in cat.variables],
+        'parts': {sec.value: [asdict(p) for p in parts] for sec, parts in cat.parts.items()},
+        'styles': [asdict(s) for s in cat.styles],
+        'metadata': cat.metadata,
+        'version': cat.version,
     }
-    for key, val in defaults.items():
-        if key not in st.session_state:
-            st.session_state[key] = val
+    return json.dumps(data, indent=2, ensure_ascii=False)
 
-init_session_state()
-
-registry: Registry = st.session_state.registry
-current_cat: CategoryDef = registry.get_category(st.session_state.current_category)
-current_sector: SectorDef = registry.get_sector(st.session_state.current_sector)
-
-# ═══════════════════════════════════════════════════════════════════════
-# UI COMPONENTS
-# ═══════════════════════════════════════════════════════════════════════
-
-def render_toast(message: str, type: str = "info", duration: int = 3000):
-    st.session_state.toasts.append({"id": str(uuid.uuid4()), "message": message, "type": type, "time": datetime.now()})
-    # Auto-clean handled in render_toasts()
-
-def render_toasts():
-    if not st.session_state.toasts:
-        return
-    now = datetime.now()
-    st.session_state.toasts = [t for t in st.session_state.toasts if (now - t["time"]).total_seconds() * 1000 < 5000]
-    
-    toast_html = '<div class="toast-container">'
-    for toast in st.session_state.toasts:
-        toast_html += f'<div class="toast {toast["type"]}">{toast["message"]}</div>'
-    toast_html += '</div>'
-    st.markdown(toast_html, unsafe_allow_html=True)
-
-def render_modal():
-    if not st.session_state.modal_open:
-        return
-    
-    title, content, actions = st.session_state.modal_data
-    
-    modal_html = f"""
-<div class="modal-overlay" onclick="parent.postMessage({{'type': 'modal_close'}}, '*')">
-    <div class="modal" onclick="event.stopPropagation()">
-        <div class="modal-header">
-            <span class="modal-title">{title}</span>
-            <button class="modal-close" onclick="parent.postMessage({{'type': 'modal_close'}}, '*')">×</button>
-        </div>
-        {content}
-    </div>
-</div>
-"""
-    st.markdown(modal_html, unsafe_allow_html=True)
-    
-    # Handle actions via session state
-    for action_key, action_fn in actions.items():
-        if st.session_state.get(f"modal_action_{action_key}"):
-            action_fn()
-            st.session_state[f"modal_action_{action_key}"] = False
-            st.session_state.modal_open = False
-            st.rerun()
-
-def open_modal(title: str, content: str, actions: Dict[str, Callable]):
-    st.session_state.modal_open = True
-    st.session_state.modal_data = (title, content, actions)
-
-def close_modal():
-    st.session_state.modal_open = False
-    st.session_state.modal_data = None
+def import_category_json(json_str: str) -> Optional[tuple]:
+    try:
+        data = json.loads(json_str)
+        cat = CategoryDef(
+            key=data['key'],
+            name=data['name'],
+            description=data['description'],
+            icon=data.get('icon', '📝'),
+            sector=data.get('sector', 'personal'),
+            variables=[VariableDef(**v) for v in data.get('variables', [])],
+            parts={SectionType(sec): [TemplatePart(**p) for p in parts] for sec, parts in data.get('parts', {}).items()},
+            styles=[StyleDef(**s) for s in data.get('styles', [])],
+            metadata=data.get('metadata', {}),
+            version=data.get('version', 1),
+        )
+        return cat.key, cat
+    except Exception as e:
+        st.error(f"Import failed: {e}")
+        return None
 
 # ═══════════════════════════════════════════════════════════════════════
 # SIDEBAR — SECTOR NAVIGATION
@@ -2152,190 +1717,86 @@ def close_modal():
 
 with st.sidebar:
     st.markdown("""
-    <div style="padding: var(--space-md) 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: var(--space-md);">
-        <div style="display: flex; align-items: center; gap: var(--space-sm);">
-            <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--grad-primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">✍️</div>
-            <div>
-                <div style="font-weight: 700; font-size: 1.125rem; background: var(--grad-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">WriteUp Studio</div>
-                <div style="font-size: 0.7rem; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.05em;">Premium Edition</div>
-            </div>
-        </div>
+    <div style="text-align: center; padding: 1rem 0 2rem;">
+        <h1 style="margin: 0; background: var(--grad-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.5rem;">✍️ WriteUp Studio</h1>
+        <p style="color: var(--fg-muted); font-size: 0.85rem; margin-top: 0.5rem;">Premium Edition</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Sector Pills
-    st.markdown("### Sectors")
-    sectors_sorted = sorted(registry.sectors.values(), key=lambda s: s.order)
-    for sector in sectors_sorted:
-        is_active = sector.key == st.session_state.current_sector
-        cats = registry.get_categories_by_sector(sector.key)
-        cat_count = len(cats)
-        
-        pill_html = f"""
-        <div class="sector-pill {'active' if is_active else ''}" style="background: {sector.gradient}; color: white; margin-bottom: 6px;" 
-             onclick="parent.postMessage({{'type': 'sector_select', 'sector': '{sector.key}'}}, '*')">
-            <span>{sector.icon}</span>
-            <span>{sector.name}</span>
-            <span style="margin-left: auto; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: var(--radius-full); font-size: 0.65rem;">{cat_count}</span>
-        </div>
-        """
-        st.markdown(pill_html, unsafe_allow_html=True)
-    
-    # Handle sector selection via query params / session state hack
-    # Streamlit doesn't support onclick directly, so we use a selectbox as fallback
-    sector_options = {s.key: s.name for s in sectors_sorted}
-    selected_sector = st.selectbox(
-        "Navigate Sector",
-        options=list(sector_options.keys()),
-        format_func=lambda k: sector_options[k],
-        index=list(sector_options.keys()).index(st.session_state.current_sector),
-        label_visibility="collapsed",
-        key="sector_nav_select"
-    )
-    if selected_sector != st.session_state.current_sector:
-        st.session_state.current_sector = selected_sector
-        # Auto-select first category in sector
-        cats = registry.get_categories_by_sector(selected_sector)
-        if cats:
-            st.session_state.current_category = cats[0].key
-        st.rerun()
-    
-    st.divider()
-    
-    # Categories in current sector
-    st.markdown("### Categories")
-    cats_in_sector = registry.get_categories_by_sector(st.session_state.current_sector)
-    for cat in cats_in_sector:
-        is_selected = cat.key == st.session_state.current_category
-        sector_color = registry.get_sector(cat.sector).color if registry.get_sector(cat.sector) else TOKENS.accent_primary
-        
-        card_html = f"""
-        <div class="category-card {'selected' if is_selected else ''}" 
-             style="--sector-gradient: {registry.get_sector(cat.sector).gradient if registry.get_sector(cat.sector) else TOKENS.grad_primary}; --sector-color: {sector_color}; --sector-color-rgb: {tuple(int(sector_color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))};"
-             onclick="parent.postMessage({{'type': 'category_select', 'category': '{cat.key}'}}, '*')">
-            <div class="category-icon">{cat.icon}</div>
-            <div class="category-name">{cat.name}</div>
-            <div class="category-desc">{cat.description[:80]}{'...' if len(cat.description) > 80 else ''}</div>
-        </div>
-        """
-        st.markdown(card_html, unsafe_allow_html=True)
-    
-    # Category selectbox fallback
-    cat_options = {c.key: c.name for c in cats_in_sector}
-    if cat_options:
-        selected_cat = st.selectbox(
-            "Select Category",
-            options=list(cat_options.keys()),
-            format_func=lambda k: cat_options[k],
-            index=list(cat_options.keys()).index(st.session_state.current_category) if st.session_state.current_category in cat_options else 0,
-            label_visibility="collapsed",
-            key="cat_nav_select"
-        )
-        if selected_cat != st.session_state.current_category:
-            st.session_state.current_category = selected_cat
+    # Theme toggle
+    theme_col1, theme_col2 = st.columns([3, 1])
+    with theme_col2:
+        if st.button("☀️" if st.session_state.theme == "dark" else "🌙", key="theme_toggle", help="Toggle theme"):
+            st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
             st.rerun()
     
     st.divider()
     
-    # Quick Actions
-    st.markdown("### Actions")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("➕ Category", use_container_width=True):
-            st.session_state.show_new_category = True
-            st.rerun()
-    with col2:
-        if st.button("📥 Import", use_container_width=True):
-            st.session_state.modal_open = True
-            st.session_state.modal_data = ("Import Category", render_import_modal_content(), {"import": do_import_category})
-            st.rerun()
+    # Sector navigation
+    st.markdown("### 📂 Sectors")
+    for sector_key in sorted(registry.sectors.keys(), key=lambda k: registry.sectors[k].order):
+        sector = registry.sectors[sector_key]
+        categories = registry.get_categories_by_sector(sector_key)
+        if not categories:
+            continue
+        
+        with st.expander(f"{sector.icon} {sector.name} ({len(categories)})", expanded=(sector_key == cat.sector)):
+            for c in categories:
+                is_active = c.key == st.session_state.current_category
+                btn_label = f"{'▸ ' if is_active else '  '}{c.icon} {c.name}"
+                if st.button(btn_label, key=f"cat_{c.key}", use_container_width=True, type="primary" if is_active else "secondary"):
+                    st.session_state.current_category = c.key
+                    st.rerun()
     
-    col3, col4 = st.columns(2)
-    with col3:
-        if st.button("📤 Export All", use_container_width=True):
-            export_all_categories()
-    with col4:
-        if st.button("⚙️ Settings", use_container_width=True):
-            st.session_state.modal_open = True
-            st.session_state.modal_data = ("Settings", render_settings_modal_content(), {"save_settings": save_settings})
-            st.rerun()
+    st.divider()
     
-    # Theme Toggle
-    theme_col1, theme_col2, theme_col3 = st.columns(3)
-    theme_icons = {"dark": "🌙", "light": "☀️", "auto": "🖥️"}
-    for i, (mode, icon) in enumerate(theme_icons.items()):
-        with [theme_col1, theme_col2, theme_col3][i]:
-            if st.button(icon, use_container_width=True, type="primary" if st.session_state.theme_mode == ThemeMode(mode) else "secondary"):
-                st.session_state.theme_mode = ThemeMode(mode)
+    # Category actions
+    st.markdown("### ⚙️ Category")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        if st.button("➕ New", use_container_width=True):
+            st.session_state.show_new_cat = True
+    with c2:
+        if st.button("✏️ Edit", use_container_width=True):
+            st.session_state.editing_category = True
+    with c3:
+        if st.button("🗑️", use_container_width=True, help="Delete category"):
+            if len(registry.categories) > 1:
+                del registry.categories[st.session_state.current_category]
+                st.session_state.current_category = next(iter(registry.categories))
                 st.rerun()
     
-    st.divider()
-    st.caption(f"v2.1.0 • {len(registry.categories)} categories • {len(registry.sectors)} sectors")
-
-# ═══════════════════════════════════════════════════════════════════════
-# MODAL CONTENTS
-# ═══════════════════════════════════════════════════════════════════════
-
-def render_import_modal_content() -> str:
-    return """
-    <div style="display: flex; flex-direction: column; gap: var(--space-md);">
-        <p style="color: var(--fg-secondary); margin: 0;">Paste category JSON or upload a .json file</p>
-        <textarea id="import-json" style="width: 100%; min-height: 200px; background: var(--bg-tertiary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--fg-primary); padding: var(--space-md); font-family: var(--font-mono); font-size: 0.75rem; resize: vertical;" placeholder='{"name": "My Category", "key": "my_category", "sector": "personal", ...}'></textarea>
-        <div style="display: flex; gap: var(--space-sm); justify-content: flex-end;">
-            <button class="stButton" onclick="parent.postMessage({type: 'modal_close'}, '*')">Cancel</button>
-            <button class="stButton" kind="primary" onclick="doImport()">Import</button>
-        </div>
-    </div>
-    <script>
-    function doImport() {
-        const json = document.getElementById('import-json').value;
-        parent.postMessage({type: 'import_category', json: json}, '*');
-    }
-    </script>
-    """
-
-def render_settings_modal_content() -> str:
-    return f"""
-    <div style="display: flex; flex-direction: column; gap: var(--space-lg);">
-        <div>
-            <label style="display: block; font-weight: 500; margin-bottom: var(--space-sm);">Theme</label>
-            <div style="display: flex; gap: var(--space-sm);">
-                <button class="stButton {'primary' if st.session_state.theme_mode == ThemeMode.DARK else 'secondary'}" onclick="parent.postMessage({{type: 'set_theme', mode: 'dark'}}, '*')">🌙 Dark</button>
-                <button class="stButton {'primary' if st.session_state.theme_mode == ThemeMode.LIGHT else 'secondary'}" onclick="parent.postMessage({{type: 'set_theme', mode: 'light'}}, '*')">☀️ Light</button>
-                <button class="stButton {'primary' if st.session_state.theme_mode == ThemeMode.AUTO else 'secondary'}" onclick="parent.postMessage({{type: 'set_theme', mode: 'auto'}}, '*')">🖥️ Auto</button>
-            </div>
-        </div>
-        <div>
-            <label style="display: block; font-weight: 500; margin-bottom: var(--space-sm);">Live Preview</label>
-            <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
-                <input type="checkbox" {"checked" if st.session_state.live_preview else ""} onchange="parent.postMessage({{type: 'set_live_preview', value: this.checked}}, '*')">
-                <span>Generate preview as you type</span>
-            </label>
-        </div>
-        <div>
-            <label style="display: block; font-weight: 500; margin-bottom: var(--space-sm);">Keyboard Shortcuts</label>
-            <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
-                <input type="checkbox" {"checked" if st.session_state.keyboard_shortcuts else ""} onchange="parent.postMessage({{type: 'set_shortcuts', value: this.checked}}, '*')">
-                <span>Enable keyboard shortcuts (Ctrl+G generate, Ctrl+S save, etc.)</span>
-            </label>
-        </div>
-        <div style="display: flex; gap: var(--space-sm); justify-content: flex-end; margin-top: var(--space-md);">
-            <button class="stButton" onclick="parent.postMessage({{type: 'modal_close'}}, '*')">Cancel</button>
-            <button class="stButton" kind="primary" onclick="parent.postMessage({{type: 'save_settings'}}, '*')">Save</button>
-        </div>
-    </div>
-    """
+    # Export/Import
+    with st.expander("📦 Export / Import"):
+        json_data = export_category_json(st.session_state.current_category)
+        st.download_button(
+            "📥 Export JSON",
+            data=json_data,
+            file_name=f"{st.session_state.current_category}.json",
+            mime="application/json",
+            use_container_width=True
+        )
+        uploaded = st.file_uploader("Import JSON", type="json", label_visibility="collapsed")
+        if uploaded:
+            result = import_category_json(uploaded.read().decode())
+            if result:
+                key, new_cat = result
+                registry.categories[key] = new_cat
+                registry.sectors[new_cat.sector].categories.append(key)
+                st.session_state.current_category = key
+                toast(f"Imported: {new_cat.name}")
+                st.rerun()
+    
+    # Stats
+    st.caption(f"**{cat.name}**")
+    st.caption(f"Vars: {len(cat.variables)} • Parts: {sum(len(p) for p in cat.parts.values())} • Styles: {len(cat.styles)}")
 
 # ═══════════════════════════════════════════════════════════════════════
 # MAIN TABS
 # ═══════════════════════════════════════════════════════════════════════
 
-# Re-fetch current category after potential changes
-current_cat = registry.get_category(st.session_state.current_category)
-current_sector = registry.get_sector(st.session_state.current_sector)
-
-tab_generate, tab_variables, tab_templates, tab_styles, tab_analytics, tab_plugins = st.tabs([
-    "🎲 Generate", "🔧 Variables", "📝 Templates", "🎨 Styles", "📊 Analytics", "🔌 Plugins"
+tab_generate, tab_variables, tab_templates, tab_styles, tab_settings = st.tabs([
+    "🎲 Generate", "🔧 Variables", "📝 Templates", "🎨 Styles", "⚙️ Settings"
 ])
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -2343,199 +1804,108 @@ tab_generate, tab_variables, tab_templates, tab_styles, tab_analytics, tab_plugi
 # ═══════════════════════════════════════════════════════════════════════
 
 with tab_generate:
-    # Header with category info
-    sector_grad = current_sector.gradient if current_sector else TOKENS.grad_primary
-    sector_color = current_sector.color if current_sector else TOKENS.accent_primary
+    col_gen, col_history = st.columns([3, 1], gap="large")
     
-    st.markdown(f"""
-    <div class="grad-border-card" style="--sector-gradient: {sector_grad};">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-md);">
-            <div style="display: flex; align-items: center; gap: var(--space-md);">
-                <span style="font-size: 2rem;">{current_cat.icon}</span>
-                <div>
-                    <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">{current_cat.name}</h2>
-                    <p style="margin: 0; color: var(--fg-secondary);">{current_cat.description}</p>
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: var(--space-sm);">
-                <span class="sector-pill" style="background: {sector_grad}; color: white;">{current_sector.icon} {current_sector.name}</span>
-                <span class="badge badge-accent">v{current_cat.version}</span>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Generation Controls
-    with st.container():
+    with col_gen:
+        # Controls card
         st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+        st.markdown("#### Generation Controls")
         
-        col_style, col_sections, col_actions = st.columns([2, 3, 2], gap="large")
+        c1, c2, c3 = st.columns([2, 3, 2])
+        with c1:
+            style_names = [s.name for s in cat.styles]
+            style = st.selectbox("Style", style_names, index=style_names.index("clean") if "clean" in style_names else 0)
+            style_def = next(s for s in cat.styles if s.name == style)
         
-        with col_style:
-            st.markdown("**Style**")
-            style_options = {s.name: s.label for s in current_cat.styles}
-            style_default = "clean" if "clean" in style_options else list(style_options.keys())[0]
-            selected_style_name = st.selectbox(
-                "Style",
-                options=list(style_options.keys()),
-                format_func=lambda k: style_options[k],
-                index=list(style_options.keys()).index(style_default),
-                label_visibility="collapsed",
-                key="gen_style"
-            )
-            selected_style = next(s for s in current_cat.styles if s.name == selected_style_name)
-            st.caption(selected_style.description)
-        
-        with col_sections:
-            st.markdown("**Sections to Include**")
+        with c2:
+            st.markdown("**Include Sections**")
             sec_cols = st.columns(4)
             include_sections = []
-            section_defaults = {
-                SectionType.OPENER: True,
-                SectionType.MIDDLE: True,
-                SectionType.CLOSER: True,
-                SectionType.EXTRA: False,
-            }
             for i, sec in enumerate(SectionType):
                 with sec_cols[i]:
-                    count = len(current_cat.parts.get(sec, []))
-                    label = f"{sec.value.capitalize()} ({count})"
-                    if st.checkbox(label, value=section_defaults[sec], key=f"inc_{sec.value}"):
+                    default = sec in [SectionType.OPENER, SectionType.MIDDLE, SectionType.CLOSER]
+                    if st.checkbox(sec.value.capitalize(), value=default, key=f"inc_{sec.value}"):
                         include_sections.append(sec)
         
-        with col_actions:
+        with c3:
             st.markdown("<br>", unsafe_allow_html=True)
-            gen_col1, gen_col2 = st.columns(2)
-            with gen_col1:
-                generate_btn = st.button("🎲 Generate", type="primary", use_container_width=True, key="btn_generate")
-            with gen_col2:
-                batch_btn = st.button("🎲×5 Batch", use_container_width=True, key="btn_batch")
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            exp_col1, exp_col2 = st.columns(2)
-            with exp_col1:
-                export_format = st.selectbox("Export", ["Markdown", "Text", "JSON", "HTML"], label_visibility="collapsed")
-            with exp_col2:
-                if st.button("💾 Export", use_container_width=True, key="btn_export"):
-                    if st.session_state.history:
-                        export_current(export_format.lower())
-                    else:
-                        render_toast("Nothing to export — generate first", "warning")
-        
+            g1, g2 = st.columns(2)
+            with g1:
+                generate_clicked = st.button("🎲 Generate", type="primary", use_container_width=True)
+            with g2:
+                batch_clicked = st.button("🎲×5 Batch", use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Generate Logic
-    if generate_btn and include_sections:
-        generator = registry.get_generator("default")
-        variables = {v.key: v.default for v in current_cat.variables}
-        result = generator.generate(current_cat, selected_style, include_sections, variables)
-        st.session_state.history.insert(0, result)
-        st.session_state.history = st.session_state.history[:100]
-        render_toast(f"Generated with {selected_style.label} style", "success")
-        st.rerun()
-    
-    if batch_btn and include_sections:
-        generator = registry.get_generator("default")
-        variables = {v.key: v.default for v in current_cat.variables}
-        results = []
-        for _ in range(5):
-            results.append(generator.generate(current_cat, selected_style, include_sections, variables))
         
-        combined_text = "\n\n" + "="*60 + "\n\n".join(r.text for r in results) + "\n"
-        batch_result = GenerationResult(
-            text=combined_text,
-            category_key=current_cat.key,
-            style_name=selected_style.name,
-            sections_used=include_sections,
-            variables_used=variables,
-            template_ids=[tid for r in results for tid in r.template_ids],
-            metadata={"batch": True, "count": len(results)}
-        )
-        st.session_state.history.insert(0, batch_result)
-        st.session_state.history = st.session_state.history[:100]
-        render_toast(f"Generated {len(results)} variations", "success")
-        st.rerun()
-    
-    # Output Display
-    st.markdown('<div class="premium-card">', unsafe_allow_html=True)
-    st.markdown("### Output")
-    
-    if st.session_state.history:
-        latest = st.session_state.history[0]
+        # Generate
+        if generate_clicked and include_sections:
+            generator = registry.get_generator("default")
+            result = generator.generate(cat, style_def, include_sections, {v.key: v.default for v in cat.variables})
+            st.session_state.history.insert(0, result)
+            st.session_state.history = st.session_state.history[:50]
+            toast("Generated!", "🎲")
         
-        # Action bar
-        act_cols = st.columns([1, 1, 1, 1, 2])
-        with act_cols[0]:
-            if st.button("📋 Copy", use_container_width=True, key="copy_latest"):
-                st.code(latest.text, language=None)
-                render_toast("Copied to clipboard", "success")
-        with act_cols[1]:
-            st.download_button(
-                "💾 Save",
-                data=latest.text,
-                file_name=f"writeup_{current_cat.key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
-                mime="text/plain",
-                use_container_width=True
+        if batch_clicked and include_sections:
+            generator = registry.get_generator("default")
+            results = []
+            for _ in range(5):
+                results.append(generator.generate(cat, style_def, include_sections, {v.key: v.default for v in cat.variables}))
+            combined = "\n\n" + "="*60 + "\n\n".join(r.text for r in results) + "\n"
+            batch_result = GenerationResult(
+                text=combined,
+                category_key=cat.key,
+                style_name=style_def.name,
+                sections_used=include_sections,
+                variables_used={v.key: v.default for v in cat.variables},
+                template_ids=[],
+                metadata={"batch": True, "count": 5}
             )
-        with act_cols[2]:
-            if st.button("🔄 Regenerate", use_container_width=True, key="regenerate"):
-                generator = registry.get_generator("default")
-                variables = {v.key: v.default for v in current_cat.variables}
-                result = generator.generate(current_cat, selected_style, include_sections, variables)
-                st.session_state.history[0] = result
-                render_toast("Regenerated", "success")
-                st.rerun()
-        with act_cols[3]:
-            if st.button("🗑️ Clear All", use_container_width=True, key="clear_history"):
-                st.session_state.history.clear()
-                render_toast("History cleared", "info")
-                st.rerun()
+            st.session_state.history.insert(0, batch_result)
+            st.session_state.history = st.session_state.history[:50]
+            toast("Batch generated!", "🎲")
         
-        # Output content
-        st.markdown(f'<div class="output-display">{latest.text}</div>', unsafe_allow_html=True)
-        
-        # Metadata
-        meta_cols = st.columns(4)
-        with meta_cols[0]:
-            st.caption(f"Style: **{latest.style_name}**")
-        with meta_cols[1]:
-            st.caption(f"Sections: **{', '.join(s.value for s in latest.sections_used)}**")
-        with meta_cols[2]:
-            st.caption(f"Templates: **{len(latest.template_ids)}**")
-        with meta_cols[3]:
-            st.caption(f"Generated: **{latest.generated_at[:19].replace('T', ' ')}**")
+        # Output display
+        if st.session_state.history:
+            latest = st.session_state.history[0]
+            st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+            st.markdown("#### Output")
+            
+            btn_cols = st.columns(4)
+            with btn_cols[0]:
+                if st.button("📋 Copy", use_container_width=True):
+                    st.code(latest.text, language=None)
+                    toast("Copied!", "📋")
+            with btn_cols[1]:
+                for exp in [("markdown", "💾 .md"), ("text", "💾 .txt"), ("json", "💾 .json"), ("html", "💾 .html")]:
+                    pass
+                exporter = registry.get_exporter("markdown")
+                st.download_button("💾 .md", exporter.export(latest, cat), f"writeup_{cat.key}.md", "text/markdown", use_container_width=True)
+            with btn_cols[2]:
+                exporter = registry.get_exporter("text")
+                st.download_button("💾 .txt", exporter.export(latest, cat), f"writeup_{cat.key}.txt", "text/plain", use_container_width=True)
+            with btn_cols[3]:
+                if st.button("🗑️ Clear", use_container_width=True):
+                    st.session_state.history.clear()
+                    st.rerun()
+            
+            st.markdown(f'<div class="output-box">{latest.text}</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="premium-card"><div style="text-align:center; color:var(--fg-muted); padding:3rem;">👈 Select sections and click <b>Generate</b></div></div>', unsafe_allow_html=True)
     
-    else:
-        st.markdown(f"""
-        <div class="output-placeholder">
-            <div class="icon">🎲</div>
-            <div class="title">Ready to Generate</div>
-            <div class="desc">Select sections and click <strong>Generate</strong> to create your first write-up</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # History Sidebar (right side)
-    # Note: In Streamlit we can't do true side-by-side with tabs easily, so we put history below
-    if st.session_state.history:
-        with st.expander(f"📜 History ({len(st.session_state.history)})", expanded=False):
-            for i, item in enumerate(st.session_state.history[:20]):
-                is_current = i == 0
-                preview = item.text[:120].replace('\n', ' ') + ("…" if len(item.text) > 120 else "")
-                batch_badge = " 📦 BATCH" if item.metadata.get("batch") else ""
-                
-                item_html = f"""
-                <div class="history-item {'current' if is_current else ''}" onclick="parent.postMessage({{'type': 'history_select', 'index': {i}}}, '*')">
-                    <div class="history-preview">{preview}</div>
-                    <div class="history-meta">
-                        <span class="history-badge">{item.style_name}{batch_badge}</span>
-                        <span class="history-badge">{', '.join(s.value for s in item.sections_used)}</span>
-                        <span class="history-badge">{item.generated_at[:16].replace('T', ' ')}</span>
-                    </div>
-                </div>
-                """
-                st.markdown(item_html, unsafe_allow_html=True)
+    with col_history:
+        st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+        st.markdown("#### History")
+        if st.session_state.history:
+            for i, item in enumerate(st.session_state.history):
+                preview = item.text[:100].replace('\n', ' ') + ("…" if len(item.text) > 100 else "")
+                badge = "BATCH" if item.metadata.get("batch") else item.style_name
+                if st.button(preview, key=f"hist_{i}", use_container_width=True):
+                    st.session_state.history.insert(0, st.session_state.history.pop(i))
+                    st.rerun()
+                st.caption(f"{badge} • {', '.join(s.value for s in item.sections_used)}")
+        else:
+            st.caption("No history yet")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════════════
 # TAB: VARIABLES
@@ -2543,118 +1913,92 @@ with tab_generate:
 
 with tab_variables:
     st.markdown('<div class="premium-card">', unsafe_allow_html=True)
-    st.markdown("### Variables")
-    st.caption("Define the placeholders used in templates. Values are saved per category and used during generation.")
+    st.markdown("#### Variables")
+    st.caption("Define placeholders. Values auto-save on change.")
     
-    # Add Variable Modal Trigger
-    if st.button("➕ Add Variable", use_container_width=False, key="btn_add_var"):
-        st.session_state.adding_variable = True
-        st.rerun()
-    
-    if st.session_state.adding_variable:
-        with st.form("add_var_form", clear_on_submit=True):
-            st.markdown("#### New Variable")
+    # Add variable
+    with st.expander("➕ Add Variable", expanded=st.session_state.adding_variable):
+        with st.form("add_var", clear_on_submit=True):
             vc1, vc2 = st.columns(2)
             with vc1:
-                new_key = st.text_input("Key *", placeholder="e.g. goal", help="No spaces, lowercase, underscore only")
-                new_label = st.text_input("Label *", placeholder="Relationship Goal")
+                new_key = st.text_input("Key *", placeholder="goal", help="lowercase, underscore only")
+                new_label = st.text_input("Label *", placeholder="What you're looking for")
                 new_type = st.selectbox("Type", ["text", "textarea", "select", "multiselect", "boolean", "number"])
             with vc2:
-                new_default = st.text_area("Default Value", placeholder="a wife, a partner, a forever love", height=100)
+                new_default = st.text_area("Default Value", placeholder="a wife, a partner, a forever love", height=68)
                 new_required = st.checkbox("Required", value=True)
-                new_group = st.text_input("Group", value="general", placeholder="core, contact, style, etc.")
-                new_options = st.text_area("Options (comma-separated)", placeholder="option1, option2, option3", help="For select/multiselect types")
-                new_help = st.text_input("Help Text", placeholder="Shown as tooltip")
-                new_validation = st.text_input("Validation Regex", placeholder="^[a-z]+$")
+                new_group = st.text_input("Group", value="general")
+                new_options = st.text_input("Options (comma-separated)", placeholder="opt1, opt2, opt3", help="For select/multiselect")
             
             if st.form_submit_button("Add Variable", type="primary"):
                 if new_key and new_label:
                     key = new_key.strip().lower().replace(' ', '_')
                     if not re.match(r'^[a-z][a-z0-9_]*$', key):
-                        render_toast("Key must start with letter, only lowercase/underscore", "error")
-                    elif any(v.key == key for v in current_cat.variables):
-                        render_toast("Key already exists", "error")
+                        st.error("Key must start with letter, only lowercase/underscore")
+                    elif any(v.key == key for v in cat.variables):
+                        st.error("Key already exists")
                     else:
-                        opts = [o.strip() for o in new_options.split(",")] if new_options else []
-                        current_cat.variables.append(VariableDef(
+                        cat.variables.append(VariableDef(
                             key=key, label=new_label.strip(), default=new_default,
-                            required=new_required, type=new_type, options=opts,
-                            help=new_help, validation=new_validation or None, group=new_group.strip()
+                            required=new_required, type=new_type,
+                            options=[o.strip() for o in new_options.split(',') if o.strip()],
+                            group=new_group.strip()
                         ))
-                        current_cat.updated_at = datetime.now().isoformat()
-                        registry.register_category(current_cat)
                         st.session_state.adding_variable = False
-                        render_toast(f"Added variable: {key}", "success")
+                        toast(f"Added: {key}")
                         st.rerun()
                 else:
-                    render_toast("Key and Label are required", "error")
-            
-            if st.form_submit_button("Cancel"):
-                st.session_state.adding_variable = False
-                st.rerun()
+                    st.error("Key and Label required")
+    
+    if st.button("➕ Add Variable", use_container_width=not st.session_state.adding_variable):
+        st.session_state.adding_variable = not st.session_state.adding_variable
+        st.rerun()
     
     st.divider()
     
-    # Variable Editor
-    if current_cat.variables:
-        # Group by group
-        groups = {}
-        for var in current_cat.variables:
-            groups.setdefault(var.group, []).append(var)
-        
-        for group_name, vars_in_group in groups.items():
-            st.markdown(f"**{group_name.title()}**")
-            for var in vars_in_group:
-                with st.container():
-                    st.markdown('<div class="variable-row">', unsafe_allow_html=True)
-                    
-                    vcol1, vcol2, vcol3, vcol4 = st.columns([3, 5, 1, 1])
-                    
-                    with vcol1:
-                        # Key (read-only)
-                        st.text_input("Key", value=var.key, key=f"var_key_{var.key}", label_visibility="collapsed", disabled=True)
-                    
-                    with vcol2:
-                        # Label + Input based on type
-                        new_label = st.text_input("Label", value=var.label, key=f"var_label_{var.key}", label_visibility="collapsed")
-                        
-                        if var.type == "textarea":
-                            new_val = st.text_area("Value", value=var.default, key=f"var_val_{var.key}", label_visibility="collapsed", height=80)
-                        elif var.type == "select":
-                            new_val = st.selectbox("Value", options=var.options, index=var.options.index(var.default) if var.default in var.options else 0, key=f"var_val_{var.key}", label_visibility="collapsed")
-                        elif var.type == "multiselect":
-                            default_list = var.default.split(",") if var.default else []
-                            new_val_list = st.multiselect("Value", options=var.options, default=default_list, key=f"var_val_{var.key}", label_visibility="collapsed")
-                            new_val = ",".join(new_val_list)
-                        elif var.type == "boolean":
-                            new_val = str(st.checkbox("Value", value=var.default.lower() in ("true", "1", "yes", "on"), key=f"var_val_{var.key}", label_visibility="collapsed")).lower()
-                        elif var.type == "number":
-                            new_val = str(st.number_input("Value", value=float(var.default) if var.default else 0, key=f"var_val_{var.key}", label_visibility="collapsed"))
-                        else:
-                            new_val = st.text_input("Value", value=var.default, key=f"var_val_{var.key}", label_visibility="collapsed")
-                    
-                    with vcol3:
-                        new_required = st.checkbox("Required", value=var.required, key=f"var_req_{var.key}")
-                    
-                    with vcol4:
-                        if st.button("🗑️", key=f"var_del_{var.key}", help="Delete variable"):
-                            current_cat.variables = [v for v in current_cat.variables if v.key != var.key]
-                            current_cat.updated_at = datetime.now().isoformat()
-                            registry.register_category(current_cat)
-                            render_toast(f"Deleted variable: {var.key}", "info")
-                            st.rerun()
-                    
-                    # Auto-save on change
-                    if new_label != var.label or new_val != var.default or new_required != var.required:
-                        var.label = new_label
-                        var.default = new_val
-                        var.required = new_required
-                        current_cat.updated_at = datetime.now().isoformat()
-                        registry.register_category(current_cat)
-                    
-                    st.markdown('</div>', unsafe_allow_html=True)
+    # Variable list
+    if cat.variables:
+        for i, var in enumerate(cat.variables):
+            with st.container():
+                st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+                vcol1, vcol2, vcol3, vcol4 = st.columns([3, 5, 1, 1])
+                with vcol1:
+                    st.text_input("Key", value=var.key, key=f"vk_{i}", label_visibility="collapsed", disabled=True)
+                with vcol2:
+                    new_label = st.text_input("Label", value=var.label, key=f"vl_{i}", label_visibility="collapsed")
+                with vcol3:
+                    new_req = st.checkbox("Req", value=var.required, key=f"vr_{i}")
+                with vcol4:
+                    if st.button("🗑️", key=f"vd_{i}", help="Delete"):
+                        cat.variables.pop(i)
+                        st.rerun()
+                
+                # Type-specific input
+                if var.type == "textarea":
+                    new_val = st.text_area("Value", value=var.default, key=f"vv_{i}", label_visibility="collapsed", height=80)
+                elif var.type in ["select", "multiselect"]:
+                    opts = var.options or [""]
+                    if var.type == "select":
+                        new_val = st.selectbox("Value", opts, index=opts.index(var.default) if var.default in opts else 0, key=f"vv_{i}", label_visibility="collapsed")
+                    else:
+                        new_val = st.multiselect("Value", opts, default=var.default.split(',') if var.default else [], key=f"vv_{i}", label_visibility="collapsed")
+                        new_val = ','.join(new_val)
+                elif var.type == "boolean":
+                    new_val = st.checkbox("Value", value=var.default.lower() in ['true', '1', 'yes'], key=f"vv_{i}", label_visibility="collapsed")
+                    new_val = str(new_val).lower()
+                else:
+                    new_val = st.text_input("Value", value=var.default, key=f"vv_{i}", label_visibility="collapsed")
+                
+                # Auto-save
+                if new_label != var.label or new_val != var.default or new_req != var.required:
+                    var.label = new_label
+                    var.default = new_val
+                    var.required = new_req
+                    toast(f"Saved: {var.key}", "💾")
+                
+                st.markdown('</div>', unsafe_allow_html=True)
     else:
-        st.info("No variables yet. Click **Add Variable** to create your first one.")
+        st.info("No variables yet. Add one above.")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -2669,121 +2013,93 @@ with tab_templates:
         with sec_tab:
             st.markdown('<div class="premium-card">', unsafe_allow_html=True)
             
-            # Add Part Button
-            add_key = f"add_part_{sec.value}"
-            is_adding = st.session_state.adding_part_section == sec.value
-            
-            if st.button(f"➕ Add {sec.value.capitalize()} Part", key=f"btn_{add_key}", use_container_width=not is_adding):
-                st.session_state.adding_part_section = sec.value if not is_adding else None
-                st.rerun()
-            
-            if is_adding:
-                with st.form(f"add_part_form_{sec.value}", clear_on_submit=True):
-                    st.markdown(f"#### New {sec.value.capitalize()} Part")
+            # Add part
+            with st.expander(f"➕ Add {sec.value.capitalize()} Part", expanded=st.session_state.adding_part_section == sec.value):
+                with st.form(f"add_part_{sec.value}", clear_on_submit=True):
                     pcol1, pcol2 = st.columns(2)
                     with pcol1:
-                        part_id = st.text_input("ID *", placeholder=f"{sec.value[0]}{random.randint(10,99)}", help="Unique identifier")
+                        part_id = st.text_input("ID *", placeholder=f"{sec.value[0]}{random.randint(10,99)}")
                         part_name = st.text_input("Name *", placeholder="e.g. Direct, Vision, Hook")
-                        part_weight = st.number_input("Weight", min_value=0.1, max_value=10.0, value=1.0, step=0.1, help="Higher = more likely to be selected")
-                        part_tags = st.text_input("Tags (comma-separated)", placeholder="direct, values, short")
+                        part_weight = st.number_input("Weight", min_value=0.1, max_value=10.0, value=1.0, step=0.1)
                     with pcol2:
-                        st.caption("Use `{variable}` placeholders. Supports `{var.method}` like `{topic.capitalize()}`")
-                        st.caption("Available variables: " + ", ".join([f"`{v.key}`" for v in current_cat.variables]))
-                    part_content = st.text_area("Content *", height=140, placeholder="I'm not chasing a crowd. I'm chasing {goal}.")
+                        part_tags = st.text_input("Tags (comma)", placeholder="direct, short, formal")
+                    part_content = st.text_area("Content *", height=120, placeholder="I'm not chasing a crowd. I'm chasing {goal}.")
+                    st.caption("Use `{variable}` placeholders. Supports `{var.method}` like `{topic.capitalize()}`")
                     
                     if st.form_submit_button("Add Part", type="primary"):
                         if part_id and part_name and part_content:
-                            if any(p.id == part_id for p in current_cat.parts[sec]):
-                                render_toast("ID already exists in this section", "error")
+                            if any(p.id == part_id for p in cat.parts[sec]):
+                                st.error("ID exists in this section")
                             else:
-                                current_cat.parts[sec].append(TemplatePart(
+                                cat.parts[sec].append(TemplatePart(
                                     id=part_id.strip(), name=part_name.strip(),
                                     content=part_content.strip(), section=sec,
-                                    tags=[t.strip() for t in part_tags.split(",")] if part_tags else [],
+                                    tags=[t.strip() for t in part_tags.split(',') if t.strip()],
                                     weight=part_weight
                                 ))
-                                current_cat.updated_at = datetime.now().isoformat()
-                                registry.register_category(current_cat)
                                 st.session_state.adding_part_section = None
-                                render_toast(f"Added to {sec.value}", "success")
+                                toast(f"Added to {sec.value}")
                                 st.rerun()
                         else:
-                            render_toast("All fields required", "error")
-                    
-                    if st.form_submit_button("Cancel"):
-                        st.session_state.adding_part_section = None
-                        st.rerun()
+                            st.error("All fields required")
+            
+            if st.button(f"➕ Add {sec.value.capitalize()}", key=f"btn_add_{sec.value}", use_container_width=st.session_state.adding_part_section != sec.value):
+                st.session_state.adding_part_section = sec.value if st.session_state.adding_part_section != sec.value else None
+                st.rerun()
             
             st.divider()
             
-            # Parts List
-            parts = current_cat.parts.get(sec, [])
+            # Parts list
+            parts = cat.parts.get(sec, [])
             if parts:
                 for i, part in enumerate(parts):
                     with st.container():
-                        st.markdown('<div class="part-card">', unsafe_allow_html=True)
+                        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
                         
-                        # Header
                         hcol1, hcol2, hcol3 = st.columns([4, 1, 1])
                         with hcol1:
-                            st.markdown(f'<span class="part-id">{part.id}</span> <span class="part-name">{part.name}</span>', unsafe_allow_html=True)
+                            st.markdown(f'<span class="badge badge-accent">{part.id}</span> <strong>{part.name}</strong> <span class="badge badge-success">{part.weight}x</span>', unsafe_allow_html=True)
                             if part.tags:
-                                tags_html = " ".join([f'<span style="font-size: 0.65rem; background: var(--bg-primary); border: 1px solid var(--border-subtle); padding: 1px 6px; border-radius: var(--radius-full); margin-left: 4px;">{t}</span>' for t in part.tags])
-                                st.markdown(tags_html, unsafe_allow_html=True)
+                                st.caption("Tags: " + ", ".join(f"`{t}`" for t in part.tags))
                         with hcol2:
-                            if st.button("✏️ Edit", key=f"edit_part_{sec.value}_{i}", use_container_width=True):
+                            if st.button("✏️", key=f"ep_{sec.value}_{i}", use_container_width=True, help="Edit"):
                                 st.session_state.editing_part = (sec.value, i)
                                 st.rerun()
                         with hcol3:
-                            if st.button("🗑️", key=f"del_part_{sec.value}_{i}", use_container_width=True):
-                                current_cat.parts[sec].pop(i)
-                                current_cat.updated_at = datetime.now().isoformat()
-                                registry.register_category(current_cat)
-                                render_toast("Part deleted", "info")
+                            if st.button("🗑️", key=f"dp_{sec.value}_{i}", use_container_width=True):
+                                cat.parts[sec].pop(i)
                                 st.rerun()
                         
-                        # Edit Form
+                        # Edit form
                         if st.session_state.editing_part == (sec.value, i):
-                            with st.form(f"edit_part_form_{sec.value}_{i}"):
+                            with st.form(f"edit_part_{sec.value}_{i}"):
                                 new_name = st.text_input("Name", value=part.name)
+                                new_content = st.text_area("Content", value=part.content, height=100)
                                 new_weight = st.number_input("Weight", min_value=0.1, max_value=10.0, value=part.weight, step=0.1)
                                 new_tags = st.text_input("Tags", value=", ".join(part.tags))
-                                new_content = st.text_area("Content", value=part.content, height=120)
-                                
-                                ecol1, ecol2, ecol3 = st.columns(3)
-                                with ecol1:
+                                ec1, ec2 = st.columns(2)
+                                with ec1:
                                     if st.form_submit_button("💾 Save", type="primary"):
                                         part.name = new_name.strip()
-                                        part.weight = new_weight
-                                        part.tags = [t.strip() for t in new_tags.split(",")] if new_tags else []
                                         part.content = new_content.strip()
-                                        current_cat.updated_at = datetime.now().isoformat()
-                                        registry.register_category(current_cat)
+                                        part.weight = new_weight
+                                        part.tags = [t.strip() for t in new_tags.split(',') if t.strip()]
                                         st.session_state.editing_part = None
-                                        render_toast("Saved", "success")
                                         st.rerun()
-                                with ecol2:
-                                    if st.form_submit_button("👁️ Preview"):
-                                        vars_dict = {v.key: v.default for v in current_cat.variables}
-                                        generator = registry.get_generator("default")
-                                        preview = generator._interpolate(part.content, vars_dict)
-                                        render_toast(f"Preview: {preview[:100]}...", "info")
-                                with ecol3:
+                                with ec2:
                                     if st.form_submit_button("✖️ Cancel"):
                                         st.session_state.editing_part = None
                                         st.rerun()
                         
-                        # Live Preview
-                        if st.session_state.live_preview:
-                            with st.expander("🔍 Live Preview", expanded=False):
-                                vars_dict = {v.key: v.default for v in current_cat.variables}
-                                generator = registry.get_generator("default")
-                                preview = generator._interpolate(part.content, vars_dict)
-                                st.code(preview, language=None)
+                        # Preview
+                        with st.expander("🔍 Preview Rendered"):
+                            vars_dict = {v.key: v.default for v in cat.variables}
+                            preview = registry.get_generator("default")._interpolate(part.content, vars_dict)
+                            st.code(preview, language=None)
                         
                         st.markdown('</div>', unsafe_allow_html=True)
             else:
-                st.info(f"No {sec.value} parts yet. Click **Add {sec.value.capitalize()} Part** to create one.")
+                st.info(f"No {sec.value} parts yet. Add one above.")
             
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -2793,71 +2109,49 @@ with tab_templates:
 
 with tab_styles:
     st.markdown('<div class="premium-card">', unsafe_allow_html=True)
-    st.markdown("### Style Transformers")
-    st.caption("Python lambda functions that transform generated text. Variable `t` = input text. Safe eval environment.")
+    st.markdown("#### Style Transformers")
+    st.caption("Python lambdas that transform generated text. Variable: `t` (the text string).")
     
-    # Add Style
     with st.expander("➕ Add Style", expanded=False):
-        with st.form("add_style_form", clear_on_submit=True):
+        with st.form("add_style", clear_on_submit=True):
             scol1, scol2 = st.columns([1, 3])
             with scol1:
                 style_name = st.text_input("Name *", placeholder="emoji")
                 style_label = st.text_input("Label *", placeholder="Emoji Style")
             with scol2:
-                style_desc = st.text_input("Description", placeholder="Adds emojis to key terms")
-                style_code = st.text_area("Lambda Code *", height=100, placeholder="lambda t: t.replace('wife', 'wife 👑').replace('forever', 'forever ❤️')")
-                style_category = st.text_input("Category", value="general", placeholder="formatting, platform, tone")
+                style_code = st.text_input("Lambda *", placeholder="lambda t: t.replace('wife', 'wife 👑')")
+                style_desc = st.text_input("Description", placeholder="Adds emojis to key words")
             
             if st.form_submit_button("Add Style", type="primary"):
                 if style_name and style_code:
                     if not style_code.strip().startswith("lambda"):
-                        render_toast("Must be a lambda expression", "error")
+                        st.error("Must be a lambda expression")
                     else:
-                        current_cat.styles.append(StyleDef(
-                            name=style_name.strip(), label=style_label.strip() or style_name.strip(),
-                            description=style_desc.strip(), code=style_code.strip(), category=style_category.strip()
+                        cat.styles.append(StyleDef(
+                            name=style_name.strip(), label=style_label.strip(),
+                            description=style_desc.strip(), code=style_code.strip()
                         ))
-                        current_cat.updated_at = datetime.now().isoformat()
-                        registry.register_category(current_cat)
-                        render_toast(f"Added style: {style_name}", "success")
+                        toast(f"Added style: {style_name}")
                         st.rerun()
                 else:
-                    render_toast("Name and lambda required", "error")
+                    st.error("Name and lambda required")
     
-    # Style List with Live Test
-    if current_cat.styles:
-        for style in current_cat.styles:
+    if cat.styles:
+        for s in cat.styles:
             with st.container():
-                st.markdown('<div class="part-card">', unsafe_allow_html=True)
-                
-                scol1, scol2, scol3 = st.columns([1, 4, 1])
+                st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+                scol1, scol2, scol3 = st.columns([1, 5, 1])
                 with scol1:
-                    st.markdown(f'<span class="badge badge-accent">{style.name}</span>', unsafe_allow_html=True)
-                    st.caption(style.label)
+                    st.markdown(f'<span class="badge badge-accent">{s.name}</span>', unsafe_allow_html=True)
+                    st.caption(s.label)
                 with scol2:
-                    st.code(style.code, language="python")
-                    if style.description:
-                        st.caption(style.description)
+                    st.code(s.code, language="python")
+                    if s.description:
+                        st.caption(s.description)
                 with scol3:
-                    if st.button("🧪 Test", key=f"test_style_{style.name}", use_container_width=True):
-                        # Test with sample text
-                        sample = "I'm looking for a wife and a forever love. We'll build a family together."
-                        generator = registry.get_generator("default")
-                        try:
-                            safe_globals = {"__builtins__": {"str": str, "len": len}}
-                            func = eval(style.code, safe_globals, {})
-                            result = func(sample)
-                            render_toast(f"Result: {result[:80]}...", "success")
-                        except Exception as e:
-                            render_toast(f"Error: {e}", "error")
-                    
-                    if st.button("🗑️", key=f"del_style_{style.name}", use_container_width=True):
-                        current_cat.styles = [s for s in current_cat.styles if s.name != style.name]
-                        current_cat.updated_at = datetime.now().isoformat()
-                        registry.register_category(current_cat)
-                        render_toast("Style deleted", "info")
+                    if st.button("🗑️", key=f"ds_{s.name}", help="Delete"):
+                        cat.styles = [x for x in cat.styles if x.name != s.name]
                         st.rerun()
-                
                 st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.info("No styles yet. Add one above.")
@@ -2865,313 +2159,122 @@ with tab_styles:
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════════════
-# TAB: ANALYTICS
+# TAB: SETTINGS
 # ═══════════════════════════════════════════════════════════════════════
 
-with tab_analytics:
+with tab_settings:
     st.markdown('<div class="premium-card">', unsafe_allow_html=True)
-    st.markdown("### Generation Analytics")
+    st.markdown("#### Category Settings")
     
-    if st.session_state.history:
-        total = len(st.session_state.history)
-        by_category = {}
-        by_style = {}
-        by_section = {s: 0 for s in SectionType}
+    with st.form("cat_settings"):
+        cat_name = st.text_input("Display Name", value=cat.name)
+        cat_desc = st.text_area("Description", value=cat.description, height=80)
+        cat_icon = st.text_input("Icon", value=cat.icon)
+        cat_sector = st.selectbox("Sector", list(registry.sectors.keys()), index=list(registry.sectors.keys()).index(cat.sector))
         
-        for item in st.session_state.history:
-            by_category[item.category_key] = by_category.get(item.category_key, 0) + 1
-            by_style[item.style_name] = by_style.get(item.style_name, 0) + 1
-            for sec in item.sections_used:
-                by_section[sec] += 1
-        
-        # Metrics
-        mcol1, mcol2, mcol3, mcol4 = st.columns(4)
-        with mcol1:
-            st.metric("Total Generations", total)
-        with mcol2:
-            st.metric("Categories Used", len(by_category))
-        with mcol3:
-            st.metric("Styles Used", len(by_style))
-        with mcol4:
-            avg_sections = sum(len(h.sections_used) for h in st.session_state.history) / total if total else 0
-            st.metric("Avg Sections/Gen", f"{avg_sections:.1f}")
-        
-        # Charts (using simple bars since no plotly)
-        st.markdown("#### By Category")
-        for cat_key, count in sorted(by_category.items(), key=lambda x: -x[1])[:10]:
-            cat_obj = registry.get_category(cat_key)
-            pct = count / total * 100
-            bar_width = int(pct * 2)
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: var(--space-sm); margin: 4px 0;">
-                <span style="width: 120px; font-size: 0.8rem;">{cat_obj.icon if cat_obj else '📦'} {cat_key[:18]}</span>
-                <div style="flex: 1; height: 8px; background: var(--bg-primary); border-radius: 4px; overflow: hidden;">
-                    <div style="width: {bar_width}%; height: 100%; background: var(--grad-primary); border-radius: 4px; transition: width 0.3s ease;"></div>
-                </div>
-                <span style="width: 50px; text-align: right; font-size: 0.75rem; color: var(--fg-muted);">{count} ({pct:.0f}%)</span>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown("#### By Style")
-        for style_name, count in sorted(by_style.items(), key=lambda x: -x[1])[:10]:
-            pct = count / total * 100
-            bar_width = int(pct * 2)
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: var(--space-sm); margin: 4px 0;">
-                <span style="width: 120px; font-size: 0.8rem;">🎨 {style_name[:18]}</span>
-                <div style="flex: 1; height: 8px; background: var(--bg-primary); border-radius: 4px; overflow: hidden;">
-                    <div style="width: {bar_width}%; height: 100%; background: var(--grad-secondary); border-radius: 4px; transition: width 0.3s ease;"></div>
-                </div>
-                <span style="width: 50px; text-align: right; font-size: 0.75rem; color: var(--fg-muted);">{count} ({pct:.0f}%)</span>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        st.markdown("#### Section Usage")
-        for sec, count in sorted(by_section.items(), key=lambda x: -x[1]):
-            pct = count / total * 100 if total else 0
-            bar_width = int(pct * 2)
-            st.markdown(f"""
-            <div style="display: flex; align-items: center; gap: var(--space-sm); margin: 4px 0;">
-                <span style="width: 120px; font-size: 0.8rem;">📄 {sec.value.capitalize()}</span>
-                <div style="flex: 1; height: 8px; background: var(--bg-primary); border-radius: 4px; overflow: hidden;">
-                    <div style="width: {bar_width}%; height: 100%; background: var(--accent-tertiary); border-radius: 4px; transition: width 0.3s ease;"></div>
-                </div>
-                <span style="width: 50px; text-align: right; font-size: 0.75rem; color: var(--fg-muted);">{count} ({pct:.0f}%)</span>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.info("No generation history yet. Create some content to see analytics!")
+        if st.form_submit_button("Save", type="primary"):
+            old_key = cat.key
+            cat.name = cat_name.strip()
+            cat.description = cat_desc.strip()
+            cat.icon = cat_icon.strip()
+            if cat.sector != cat_sector:
+                registry.sectors[cat.sector].categories.remove(cat.key)
+                cat.sector = cat_sector
+                registry.sectors[cat_sector].categories.append(cat.key)
+            cat.updated_at = datetime.now().isoformat()
+            toast("Saved")
+            st.rerun()
     
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+    st.markdown("#### Danger Zone")
+    if st.button("🗑️ Delete This Category", type="secondary", use_container_width=True):
+        if len(registry.categories) > 1:
+            del registry.categories[st.session_state.current_category]
+            st.session_state.current_category = next(iter(registry.categories))
+            toast("Deleted")
+            st.rerun()
+        else:
+            st.error("Cannot delete last category")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('<div class="premium-card">', unsafe_allow_html=True)
+    st.markdown("#### About")
+    st.markdown("""
+    **WriteUp Studio Premium** — Built with Streamlit
+    
+    - **No API keys** — runs entirely in browser
+    - **Plugin architecture** — generators, exporters, transformers
+    - **Sector-organized** — 6 sectors, 23 categories
+    - **Export/Import** — JSON portability
+    - **Deploy free** — Streamlit Cloud, Railway, Render
+    
+    **Shortcuts** (Generate tab):
+    - `Enter` in any input → Generate
+    - `Ctrl/Cmd + Enter` → Batch ×5
+    """)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════════════
-# TAB: PLUGINS (Extensibility)
+# MODALS: NEW/EDIT CATEGORY
 # ═══════════════════════════════════════════════════════════════════════
 
-with tab_plugins:
-    st.markdown('<div class="premium-card">', unsafe_allow_html=True)
-    st.markdown("### Plugin System")
-    st.caption("Extend WriteUp Studio with custom generators, exporters, and transformers.")
-    
-    # Generators
-    st.markdown("#### Generators")
-    for name, gen in registry.generators.items():
-        st.markdown(f"""
-        <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <strong>{name}</strong> — {gen.description}
-            </div>
-            <span class="badge badge-accent">Built-in</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Exporters
-    st.markdown("#### Exporters")
-    for name, exp in registry.exporters.items():
-        st.markdown(f"""
-        <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <strong>.{exp.extension}</strong> — {exp.mime}
-            </div>
-            <span class="badge" style="background: var(--accent-secondary); color: var(--bg-primary);">Built-in</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Add Custom Plugin (Code Editor)
-    st.markdown("#### Add Custom Plugin")
-    with st.expander("🔧 Create Generator Plugin", expanded=False):
-        with st.form("custom_generator_form"):
-            plug_name = st.text_input("Plugin Name", placeholder="my_generator")
-            plug_desc = st.text_input("Description", placeholder="Custom generator for X")
-            plug_code = st.text_area("Plugin Code", height=200, placeholder='''
-class MyGenerator:
-    name = "my_generator"
-    description = "Custom generator"
-    
-    def generate(self, category, style, sections, variables):
-        # Your logic here
-        from dataclasses import dataclass
-        @dataclass
-        class Result:
-            text: str
-            category_key: str
-            style_name: str
-            sections_used: list
-            variables_used: dict
-            template_ids: list
-        
-        return Result(
-            text="Custom output",
-            category_key=category.key,
-            style_name=style.name,
-            sections_used=sections,
-            variables_used=variables,
-            template_ids=[]
-        )
-''')
-            if st.form_submit_button("Register Plugin", type="primary"):
-                try:
-                    exec(plug_code, {"__builtins__": {}})
-                    # In real app, would register properly
-                    render_toast("Plugin code accepted (demo only — not persisted)", "success")
-                except Exception as e:
-                    render_toast(f"Error: {e}", "error")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ═══════════════════════════════════════════════════════════════════════
-# EXPORT FUNCTIONS
-# ═══════════════════════════════════════════════════════════════════════
-
-def export_current(format: str):
-    if not st.session_state.history:
-        return
-    result = st.session_state.history[0]
-    cat = registry.get_category(result.category_key)
-    exporter = registry.get_exporter(format)
-    data = exporter.export(result, cat)
-    st.download_button(
-        f"Download .{exporter.extension}",
-        data=data,
-        file_name=f"writeup_{result.category_key}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{exporter.extension}",
-        mime=exporter.mime,
-        use_container_width=True
-    )
-
-def export_all_categories():
-    all_cats = {k: asdict(v) for k, v in registry.categories.items()}
-    all_sectors = {k: asdict(v) for k, v in registry.sectors.items()}
-    data = {
-        "version": "2.1.0",
-        "exported_at": datetime.now().isoformat(),
-        "sectors": all_sectors,
-        "categories": all_cats,
-    }
-    json_str = json.dumps(data, indent=2, ensure_ascii=False)
-    st.download_button(
-        "Download Complete Export (JSON)",
-        data=json_str,
-        file_name=f"writeup_studio_export_{datetime.now().strftime('%Y%m%d')}.json",
-        mime="application/json",
-        use_container_width=True
-    )
-    render_toast("Export ready for download", "success")
-
-def do_import_category():
-    # Handled via JS postMessage in real implementation
-    pass
-
-def save_settings():
-    render_toast("Settings saved", "success")
-
-# ═══════════════════════════════════════════════════════════════════════
-# NEW CATEGORY MODAL
-# ═══════════════════════════════════════════════════════════════════════
-
-if st.session_state.show_new_category:
-    with st.form("new_category_form", clear_on_submit=True):
-        st.markdown("### Create New Category")
-        
-        ncol1, ncol2 = st.columns(2)
-        with ncol1:
-            nkey = st.text_input("Key *", placeholder="my_category", help="Unique ID, lowercase/underscore")
-            nname = st.text_input("Display Name *", placeholder="My Category")
-            nsector = st.selectbox("Sector *", options=list(registry.sectors.keys()), format_func=lambda k: f"{registry.sectors[k].icon} {registry.sectors[k].name}")
-        with ncol2:
-            nicon = st.text_input("Icon", placeholder="✨", max_chars=2)
-            ndesc = st.text_area("Description", placeholder="What this category is for", height=80)
+if st.session_state.show_new_cat:
+    with st.form("new_cat_form", clear_on_submit=True):
+        st.markdown("### New Category")
+        nkey = st.text_input("Key *", placeholder="my_category", help="Unique ID, lowercase/underscore")
+        nname = st.text_input("Display Name *", placeholder="My Category")
+        ndesc = st.text_area("Description", placeholder="What this category is for")
+        nicon = st.text_input("Icon", value="📝")
+        nsector = st.selectbox("Sector", list(registry.sectors.keys()))
         
         c1, c2 = st.columns(2)
         with c1:
-            if st.form_submit_button("Create Category", type="primary"):
-                if nkey and nname and nsector:
+            if st.form_submit_button("Create", type="primary"):
+                if nkey and nname:
                     key = nkey.strip().lower().replace(' ', '_')
                     if not re.match(r'^[a-z][a-z0-9_]*$', key):
-                        render_toast("Invalid key format", "error")
+                        st.error("Invalid key format")
                     elif key in registry.categories:
-                        render_toast("Key already exists", "error")
+                        st.error("Key exists")
                     else:
-                        new_cat = CategoryDef(
+                        registry.categories[key] = CategoryDef(
                             key=key, name=nname.strip(), description=ndesc.strip(),
-                            icon=nicon.strip() or "📦", sector=nsector
+                            icon=nicon.strip(), sector=nsector
                         )
-                        registry.register_category(new_cat)
+                        registry.sectors[nsector].categories.append(key)
                         st.session_state.current_category = key
-                        st.session_state.current_sector = nsector
-                        st.session_state.show_new_category = False
-                        render_toast(f"Created category: {nname}", "success")
+                        st.session_state.show_new_cat = False
+                        toast(f"Created: {nname}")
                         st.rerun()
                 else:
-                    render_toast("Key, Name, and Sector required", "error")
+                    st.error("Key and Name required")
         with c2:
             if st.form_submit_button("Cancel"):
-                st.session_state.show_new_category = False
+                st.session_state.show_new_cat = False
                 st.rerun()
-
-# ═══════════════════════════════════════════════════════════════════════
-# RENDER TOASTS & MODAL
-# ═══════════════════════════════════════════════════════════════════════
-
-render_toasts()
-render_modal()
-
-# ═══════════════════════════════════════════════════════════════════════
-# KEYBOARD SHORTCUTS (via JS injection)
-# ═══════════════════════════════════════════════════════════════════════
-
-if st.session_state.keyboard_shortcuts:
-    st.markdown("""
-<script>
-document.addEventListener('keydown', function(e) {
-    // Ctrl/Cmd + G -> Generate
-    if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
-        e.preventDefault();
-        const btn = document.querySelector('button[key="btn_generate"]');
-        if (btn) btn.click();
-    }
-    // Ctrl/Cmd + Shift + G -> Batch
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'G') {
-        e.preventDefault();
-        const btn = document.querySelector('button[key="btn_batch"]');
-        if (btn) btn.click();
-    }
-    // Ctrl/Cmd + S -> Save/Export
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        const btn = document.querySelector('button[key="btn_export"]');
-        if (btn) btn.click();
-    }
-    // Ctrl/Cmd + N -> New Category
-    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-        e.preventDefault();
-        // Trigger via session state would need rerun
-    }
-    // Escape -> Close Modal
-    if (e.key === 'Escape') {
-        window.parent.postMessage({type: 'modal_close'}, '*');
-    }
-});
-</script>
-""", unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════════════
 # FOOTER
 # ═══════════════════════════════════════════════════════════════════════
 
-st.markdown(f"""
+st.markdown("""
 <hr style="border-color: var(--border-subtle); margin-top: 3rem;">
-<div style="text-align: center; color: var(--fg-muted); font-size: 0.8rem; padding: var(--space-lg);">
-    <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-lg); flex-wrap: wrap; margin-bottom: var(--space-sm);">
-        <span>WriteUp Studio Premium v2.1.0</span>
-        <span>•</span>
-        <span>{len(registry.categories)} categories across {len(registry.sectors)} sectors</span>
-        <span>•</span>
-        <span>Plugin architecture ready</span>
-    </div>
-    <div style="font-size: 0.75rem;">
-        Built with <span style="color: var(--accent-primary);">Streamlit</span> • 
-        Design system: Custom CSS + Design Tokens • 
-        Deploy free on <a href="https://streamlit.io/cloud" target="_blank" style="color: var(--accent-primary);">Streamlit Cloud</a>
-    </div>
+<div style="text-align: center; color: var(--fg-muted); font-size: 0.85rem; padding: 1rem;">
+    WriteUp Studio Premium • 
+    <a href="https://github.com" target="_blank" style="color: var(--accent-primary);">Open Source</a> • 
+    Deploy on <a href="https://streamlit.io/cloud" target="_blank" style="color: var(--accent-primary);">Streamlit Cloud</a> free
 </div>
 """, unsafe_allow_html=True)
+
+# ═══════════════════════════════════════════════════════════════════════
+# ENTRY POINT
+# ═══════════════════════════════════════════════════════════════════════
+
+def main():
+    inject_premium_css()
+    # App runs via Streamlit's top-to-bottom execution
+
+if __name__ == "__main__":
+    main()
